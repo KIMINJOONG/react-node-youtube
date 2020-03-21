@@ -2,16 +2,18 @@ const express = require("express");
 const app = express();
 const port = 5000;
 const bodyParser = require("body-parser");
-const config = require("./server/config/key");
+const config = require("./config/key");
 const cookieParser = require("cookie-parser");
-const { auth } = require("./server/middleware/auth");
+const { auth } = require("./middleware/auth");
+const cors = require("cors");
 
-const { User } = require("./server/models/User");
+const { User } = require("./models/User");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(cors());
 
 const mongoose = require("mongoose");
 mongoose
@@ -25,6 +27,10 @@ mongoose
     .catch(err => console.log(err));
 
 app.get("/", (req, res) => res.send("Hello World"));
+
+app.get("/api/hello", (req, res) => {
+    res.send("안녕하세요");
+});
 
 app.post("/api/users/register", (req, res) => {
     const user = new User(req.body);
