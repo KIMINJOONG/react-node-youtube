@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Typography, Button, Form, message, Input } from "antd";
 import Dropzone from "react-dropzone";
+import axios from "axios";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -51,6 +52,27 @@ const videoUploadPage = () => {
         setCategory(e.target.value);
     };
 
+    const onDrop = files => {
+        let formData = new FormData();
+        const config = {
+            header: { "content-type": "multipart/form-data" }
+        };
+        formData.append("file", files[0]);
+
+        axios
+            .post(
+                "http://localhost:5000/api/video/uploadfiles",
+                formData,
+                config
+            )
+            .then(response => {
+                if (response.data.success) {
+                } else {
+                    alert("비디오 업로드 실패");
+                }
+            });
+    };
+
     return (
         <div style={{ maxWidth: "700px", margin: "2rem atuo" }}>
             <div style={{ textAlign: "center", marginBottom: "2rem" }}>
@@ -60,7 +82,7 @@ const videoUploadPage = () => {
                 <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                    <Dropzone onDrop multiple maxSize>
+                    <Dropzone onDrop={onDrop} multiple={false} maxSize>
                         {({ getRootProps, getInputProps }) => (
                             <div
                                 style={{
@@ -98,7 +120,7 @@ const videoUploadPage = () => {
                 <br />
                 <br />
 
-                <select onChange={onPrivateChange}>
+                <select onChange={onPrivateChange} value={private}>
                     {PrivateOptions.map((item, index) => (
                         <option key={index} value={item.value}>
                             {item.label}
@@ -109,7 +131,7 @@ const videoUploadPage = () => {
                 <br />
                 <br />
 
-                <select onChange={onCategoryChange}>
+                <select onChange={onCategoryChange} value={category}>
                     {CategoryOptions.map((item, index) => (
                         <option key={index} value={item.value}>
                             {item.label}

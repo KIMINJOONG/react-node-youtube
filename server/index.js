@@ -89,4 +89,6 @@ app.get("/api/users/logout", auth, (req, res) => {
     });
 });
 
+app.use("/api/video", require("./routes/video"));
+
 app.listen(port, () => console.log(`sever run http://localhost:${port}`));
