@@ -35,6 +35,9 @@ const videoUploadPage = () => {
     const [description, setDescription] = useState("");
     const [private, setPrivate] = useState(0);
     const [category, setCategory] = useState("Film & Animation");
+    const [filePath, setFilePath] = useState("");
+    const [duration, setDuration] = useState("");
+    const [thumbnailPath, setThumbnailPath] = useState("");
 
     const onTitleChange = e => {
         setVideoTitle(e.target.value);
@@ -67,6 +70,25 @@ const videoUploadPage = () => {
             )
             .then(response => {
                 if (response.data.success) {
+                    let variable = {
+                        url: response.data.url,
+                        fileName: response.data.fileName
+                    };
+
+                    setFilePath(response.data.url);
+                    axios
+                        .post(
+                            "http://localhost:5000/api/video/thumbnail",
+                            variable
+                        )
+                        .then(response => {
+                            if (response.data.success) {
+                                setDuration(response.data.fileDuration);
+                                setThumbnailPath(response.data.url);
+                            } else {
+                                alert("비디오 업로드 실패");
+                            }
+                        });
                 } else {
                     alert("비디오 업로드 실패");
                 }
@@ -99,6 +121,15 @@ const videoUploadPage = () => {
                             </div>
                         )}
                     </Dropzone>
+
+                    {thumbnailPath && (
+                        <div>
+                            <img
+                                src={`http://localhost:5000/${thumbnailPath}`}
+                                alt="thumbnail"
+                            />
+                        </div>
+                    )}
 
                     <div>
                         <img src alt />

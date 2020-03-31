@@ -3,6 +3,7 @@ const router = express.Router();
 // const { Video } = require("../models/Video");
 const { auth } = require("../middleware/auth");
 const multer = require("multer");
+const ffmpeg = require("fluent-ffmpeg");
 
 let storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -33,4 +34,34 @@ router.post("/uploadfiles", (req, res) => {
             fileName: res.req.file.filename
         });
     });
+});
+
+router.post("/thumbnail", (req, res) => {
+    let filePath = "";
+    let fileDuration = "";
+    // 비디오 정보 가져오기
+    ffmpeg.ffprobe(req.body.url, function(err, metadata) {
+        fileDuration = metadata.format.duration;
+    });
+    // 썸네일 생성
+    ffmpeg(req.body.url)
+        .on("filenames", function(filenames) {
+            filePath = "uploads/thumbnails" + filenames[0];
+        })
+        .on("end", function() {
+            return res.json({
+                success: true,
+                url: filePath,
+                fileDuration: fileDuration
+            });
+        })
+        .on("error", function(err) {
+            return res.json({ success: false, err });
+        })
+        .screenshots({
+            count: 3,
+            folder: "uploads/thumbnails",
+            size: "320x240",
+            filename: "thumbnail-%b.png"
+        });
 });
