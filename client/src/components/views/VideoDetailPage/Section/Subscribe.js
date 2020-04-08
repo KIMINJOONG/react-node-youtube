@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const Subscribe = ({ userTo }) => {
+const Subscribe = ({ userTo, userFrom }) => {
     const [subscribeNumber, SetsubscribeNumber] = useState(0);
     const [subscribed, setSubscribed] = useState(false);
     useEffect(() => {
@@ -38,11 +38,47 @@ const Subscribe = ({ userTo }) => {
                 }
             });
     }, []);
+
+    const onSubscribe = () => {
+        let subscribedVariable = {
+            userTo,
+            userFrom,
+        };
+        if (subscribed) {
+            axios
+                .post(
+                    `http://localhost:5000/api/subscribe/unSubscribe`,
+                    subscribedVariable
+                )
+                .then((response) => {
+                    if (response.data.success) {
+                        SetsubscribeNumber(subscribeNumber - 1);
+                        setSubscribed(!subscribed);
+                    } else {
+                        alert("구독 취소하는데 실패하였습니다.");
+                    }
+                });
+        } else {
+            axios
+                .post(
+                    `http://localhost:5000/api/subscribe/subscribe`,
+                    subscribedVariable
+                )
+                .then((response) => {
+                    if (response.data.success) {
+                        SetsubscribeNumber(subscribeNumber + 1);
+                        setSubscribed(!subscribed);
+                    } else {
+                        alert("구독 하는데 실패하였습니다.");
+                    }
+                });
+        }
+    };
     return (
         <div>
             <button
                 style={{
-                    backgroundColor: `${subscribed ? "#CC0000" : '"#AAAAAA"'}`,
+                    backgroundColor: `${subscribed ? "#AAAAAA" : "#CC0000"}`,
                     borderRadius: "4px",
                     color: "white",
                     padding: "10px 16px",
@@ -50,7 +86,7 @@ const Subscribe = ({ userTo }) => {
                     fontSize: "1rem",
                     textTransform: "uppercase",
                 }}
-                onClick
+                onClick={onSubscribe}
             >
                 {subscribeNumber} {subscribed ? "Subscribed" : "Subscribe"}
             </button>
