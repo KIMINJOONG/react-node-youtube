@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Video } = require("../models/Video");
+const { Subscriber } = require("../models/Subscriber");
 const { auth } = require("../middleware/auth");
 const multer = require("multer");
 const ffmpeg = require("fluent-ffmpeg");
@@ -18,20 +19,20 @@ let storage = multer.diskStorage({
             return cb(res.status(400).end("only mp4"), false);
         }
         cb(null, true);
-    }
+    },
 });
 
 const upload = multer({ storage }).single("file");
 
 router.post("/uploadfiles", (req, res) => {
-    upload(req, res, err => {
+    upload(req, res, (err) => {
         if (err) {
             return res.json({ success: false, err });
         }
         return res.json({
             success: true,
             url: res.req.file.path,
-            fileName: res.req.file.filename
+            fileName: res.req.file.filename,
         });
     });
 });
@@ -45,6 +46,27 @@ router.post("/uploadVideo", (req, res) => {
         }
         res.status(200).json({ success: true });
     });
+});
+
+router.post("/getSubscriptionVideos", (req, res) => {
+    Subscriber.find({ userFrom: req.body.userFrom }).exec(
+        (err, subscriberInfo) => {
+            if (err) res.status(400).send(err);
+
+            let subscribedUser = [];
+
+            subscriberInfo.map((subscriber, i) => {
+                subscribedUser.push(subscriber.userTo);
+            });
+        }
+    );
+
+    Video.find({ writer: { $in: subscribedUser } })
+        .populate("writer")
+        .exec((err, videos) => {
+            if (err) return res.status(400).send(err);
+            res.status(200).json({ success: true, videos });
+        });
 });
 
 router.get("/getVideos", (req, res) => {
@@ -71,28 +93,28 @@ router.post("/thumbnail", (req, res) => {
     let filePath = "";
     let fileDuration = "";
     // 비디오 정보 가져오기
-    ffmpeg.ffprobe(req.body.url, function(err, metadata) {
+    ffmpeg.ffprobe(req.body.url, function (err, metadata) {
         fileDuration = metadata.format.duration;
     });
     // 썸네일 생성
     ffmpeg(req.body.url)
-        .on("filenames", function(filenames) {
+        .on("filenames", function (filenames) {
             filePath = "uploads/thumbnails" + filenames[0];
         })
-        .on("end", function() {
+        .on("end", function () {
             return res.json({
                 success: true,
                 url: filePath,
-                fileDuration: fileDuration
+                fileDuration: fileDuration,
             });
         })
-        .on("error", function(err) {
+        .on("error", function (err) {
             return res.json({ success: false, err });
         })
         .screenshots({
             count: 3,
             folder: "uploads/thumbnails",
             size: "320x240",
-            filename: "thumbnail-%b.png"
+            filename: "thumbnail-%b.png",
         });
 });

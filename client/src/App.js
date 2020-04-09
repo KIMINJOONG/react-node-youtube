@@ -6,6 +6,7 @@ import RegisterPage from "./components/views/RegisterPage/RegisterPage";
 import Auth from "./hoc/auth";
 import videoUploadPage from "./components/views/VideoUploadPage/VideoUploadPage";
 import VideoDetailPage from "./components/views/VideoDetailPage/VideoDetailPage";
+import SubscriptionPage from "./components/views/SubscriptionPage/SubscriptionPage";
 
 const App = () => {
     return (
@@ -36,6 +37,11 @@ const App = () => {
                         exact
                         path="/video/:videoId"
                         component={Auth(VideoDetailPage, null)}
+                    />
+                    <Route
+                        exact
+                        path="/subscription"
+                        component={Auth(SubscriptionPage, null)}
                     />
                 </Switch>
             </div>
