@@ -9,6 +9,8 @@ const VideoDetailPage = (props) => {
     const variable = { videoId };
     const [videoDetail, setVideoDetail] = useState({});
 
+    const [comments, setComments] = useState([]);
+
     useEffect(() => {
         axios
             .post(`http://localhost:5000/api/video/getVideoDetail`, variable)
@@ -49,7 +51,7 @@ const VideoDetailPage = (props) => {
                             />
                         </List.Item>
 
-                        <Comment />
+                        <Comment postId={videoId} />
                     </div>
                 </Col>
                 <Col lg={6} xs={24}>
