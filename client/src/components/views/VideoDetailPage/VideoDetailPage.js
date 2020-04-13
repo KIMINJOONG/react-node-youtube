@@ -21,7 +21,19 @@ const VideoDetailPage = (props) => {
                     alert("비디오 정보를 가져오기를 실패했습니다.");
                 }
             });
+
+        axios.post("/api/comment/getcomments", variable).then((response) => {
+            if (response.data.success) {
+                setComments(response.data.comments);
+            } else {
+                alert("코멘트 정보를 가져오는 것을 실패 하였습니다.");
+            }
+        });
     }, []);
+
+    const refreshFunction = (newComment) => {
+        setComments(comments.concat(newComment));
+    };
 
     if (videoDetail.writer) {
         return (
@@ -51,7 +63,11 @@ const VideoDetailPage = (props) => {
                             />
                         </List.Item>
 
-                        <Comment postId={videoId} />
+                        <Comment
+                            refreshFunction={refreshFunction}
+                            commentLists={comments}
+                            postId={videoId}
+                        />
                     </div>
                 </Col>
                 <Col lg={6} xs={24}>

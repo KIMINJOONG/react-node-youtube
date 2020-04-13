@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import SingleComment from "./SingleComment";
 
 const Comment = (props) => {
     const videoId = props.postId;
@@ -23,6 +24,8 @@ const Comment = (props) => {
         axios.post("/api/comment/saveComment", variables).then((response) => {
             if (response.data.success) {
                 console.log(response.data);
+
+                props.refreshFunction(response.data.result);
             } else {
                 alert("코멘트를 저장하지못했습니다");
             }
@@ -33,6 +36,19 @@ const Comment = (props) => {
             <br />
             <p> Replies </p>
             <hr />
+
+            {props.commentLists &&
+                props.commentLists.map(
+                    (comment, index) =>
+                        !comment.responseTo && (
+                            <SingleComment
+                                refreshFunction={props.refreshFunction}
+                                key={index}
+                                comment={comment}
+                                postId={props.postId}
+                            />
+                        )
+                )}
 
             <form style={{ display: "flex" }} onSubmit={onSubmit}>
                 <textarea

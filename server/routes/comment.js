@@ -14,3 +14,12 @@ router.post("/saveComment", (req, res) => {
             });
     });
 });
+
+router.post("/getcomments", (req, res) => {
+    Comment.find({ postId: req.body.videoId })
+        .populate("writer")
+        .exec((err, comments) => {
+            if (err) return res.json({ success: false, err });
+            res.status(200).json({ success: true, comments });
+        });
+});
