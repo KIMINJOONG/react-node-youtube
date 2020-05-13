@@ -29,6 +29,8 @@ const SingleComment = ({ postId, refreshFunction }) => {
         axios.post("/api/comment/saveComment", variables).then((response) => {
             if (response.data.success) {
                 console.log(response.data);
+                setCommentValue("");
+                setOpenReply(false);
                 refreshFunction(response.data.result);
             } else {
                 alert("코멘트를 저장하지못했습니다");
