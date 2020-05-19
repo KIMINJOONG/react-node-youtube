@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Comment, Avatar, Button, Input } from "antd";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import LikeDislikes from "./LikeDislikes";
 
 const SingleComment = ({ postId, refreshFunction }) => {
     const user = useSelector((state) => state.user);
@@ -38,6 +39,10 @@ const SingleComment = ({ postId, refreshFunction }) => {
         });
     };
     const actions = [
+        <LikeDislikes
+            userId={localStorage.getItem("userId")}
+            commentId={props.comment._id}
+        />,
         <span onClick={onClickReplyOpen} key="comment-basic-reply-to">
             Reply to
         </span>,
